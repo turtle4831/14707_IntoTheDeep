@@ -11,10 +11,16 @@ public class Point {
         this.PointPose = pose;
         this.commands = commands;
     }
+    public Point(Pose2d pose2d){
+        this.PointPose = pose2d;
+    }
     public Pose2d getPose(){
         return PointPose;
     }
     public void runCommand(){
         CommandScheduler.getInstance().schedule(commands);
+    }
+    public CommandBase getCommands(){
+        return this.commands;
     }
 }
