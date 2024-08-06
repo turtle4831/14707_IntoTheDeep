@@ -4,6 +4,7 @@ import com.arcrobotics.ftclib.drivebase.MecanumDrive;
 import com.arcrobotics.ftclib.geometry.Pose2d;
 import com.arcrobotics.ftclib.geometry.Rotation2d;
 import com.arcrobotics.ftclib.geometry.Translation2d;
+import com.arcrobotics.ftclib.kinematics.wpilibkinematics.ChassisSpeeds;
 import com.arcrobotics.ftclib.kinematics.wpilibkinematics.MecanumDriveKinematics;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 
@@ -21,24 +22,26 @@ import java.util.ArrayList;
 
 public class Drivetrain extends PedrioSubsystem {
 
-
-    final private double TicksToInches = 537; //when doing this for your robot make sure to change this
     private final Hardware robot = Hardware.getInstance();
     public MecanumDrive drive = new MecanumDrive(robot.FlMotor, robot.FrMotor, robot.BlMotor, robot.BrMotor);
     public final SparkFunOTOS myOtos = robot.otos;
     private CameraLocalization cameraLocalization = new CameraLocalization();
     private RegularFusing dataFuser = new RegularFusing();
-
+    private double LENGTH = 14;
+    private double WIDTH = 14;
 
     private final MecanumDriveKinematics kine = new MecanumDriveKinematics(
-            new Translation2d(-0.444, 0.472),//change this to match your robots measurement in meters 16 inches long 17 wide
-            new Translation2d(0.444, 0.472),
-            new Translation2d(-0.444, -0.472),
-            new Translation2d(0.444, 0.472)
+            new Translation2d(LENGTH / 2, WIDTH / 2),
+            new Translation2d(LENGTH / 2, -WIDTH / 2),
+            new Translation2d(-LENGTH / 2, WIDTH / 2),
+            new Translation2d(-LENGTH / 2, -WIDTH / 2)
     );
 
+
     public Pose2d getFusedPose(){
+
         Pose2d apriltagpose;
+        Pose2d cameraPose;
         ArrayList<Pose2d> aprilTagPoses = new ArrayList<>();
         int i = 0;
         for(AprilTagDetection detection : robot.aprilTag.getDetections()){
@@ -51,18 +54,25 @@ public class Drivetrain extends PedrioSubsystem {
         }
         double x = 0;
         double y = 0;
-        for(Pose2d pose : aprilTagPoses){
-            x += pose.getX();
-            y += pose.getY();
+        if(aprilTagPoses.isEmpty()){
+            cameraPose = null;
+        }else {
+            for (Pose2d pose : aprilTagPoses) {
+                x += pose.getX();
+                y += pose.getY();
+            }
+            cameraPose = new Pose2d(x / i, y / i, new Rotation2d(0));
+            aprilTagPoses.clear();
         }
-        Pose2d cameraPose =  new Pose2d(x / i, y/i, new Rotation2d(0));
         Pose2d otosPose = new Pose2d(
                 myOtos.getPosition().x,
                 myOtos.getPosition().y,
                 new Rotation2d(myOtos.getPosition().h)
         );
-
-        return dataFuser.fuse(otosPose,cameraPose,new Rotation2d(getRawIMUHeadingDegrees()));
+        if(cameraPose != null) {
+            return dataFuser.fuse(otosPose, cameraPose, new Rotation2d(getRawIMUHeadingDegrees()));
+        }
+        return otosPose;
     }
 
     public SparkFunOTOS.Pose2D getVelocity(){
@@ -71,6 +81,9 @@ public class Drivetrain extends PedrioSubsystem {
 
     public void driveFieldCentric(double x, double y, double turn, double gyroAngle) {
         drive.driveFieldCentric(x, y, turn, gyroAngle);
+    }
+    public void driveFieldCentricWithWheelSpeeds(ChassisSpeeds speeds){
+        drive.driveFieldCentric(speeds.vxMetersPerSecond,speeds.vyMetersPerSecond,speeds.omegaRadiansPerSecond,getRawIMUHeadingDegrees());
     }
 
     public SparkFunOTOS.Pose2D getPose() {

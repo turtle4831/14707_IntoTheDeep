@@ -27,7 +27,7 @@ public class RegularFusing {
         return new Pose2d(
                 new Translation2d(
                         (OTOS.getX() * otos_x_weight) + (AprilTagPose.getX() * apriltag_x_weight) /2,
-                            (OTOS.getY() * otos_y_weight) + (AprilTagPose.getY() * apriltag_y_weight) /2
+                        (OTOS.getY() * otos_y_weight) + (AprilTagPose.getY() * apriltag_y_weight) /2
 
                 ),
                 new Rotation2d(

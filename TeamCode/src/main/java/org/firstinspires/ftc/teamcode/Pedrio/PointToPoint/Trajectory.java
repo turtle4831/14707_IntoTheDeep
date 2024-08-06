@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.Pedrio.PointToPoint;
 import com.ThermalEquilibrium.homeostasis.Parameters.FeedforwardCoefficients;
 import com.ThermalEquilibrium.homeostasis.Parameters.PIDCoefficients;
 import com.arcrobotics.ftclib.controller.PIDController;
+import com.arcrobotics.ftclib.kinematics.wpilibkinematics.ChassisSpeeds;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 
 import org.firstinspires.ftc.teamcode.Pedrio.Config;
@@ -85,7 +86,9 @@ public class Trajectory {
                 drivetrain.driveFieldCentric(x, y, turn, drivetrain.getRawIMUHeadingDegrees());
 
                 if (tolerance(averageError(x, y, turn), Config.toleranceMin, Config.toleranceMax)) {
-                    this.trajectory.get(i).runCommand();
+                    if (this.trajectory.get(i).getCommands() != null){
+                        this.trajectory.get(i).runCommand();
+                    }
                     break;
                 }
 
