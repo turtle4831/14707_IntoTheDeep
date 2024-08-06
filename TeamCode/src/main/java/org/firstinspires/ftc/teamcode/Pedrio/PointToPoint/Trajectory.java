@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.Pedrio.PointToPoint;
 
+import static java.lang.Thread.sleep;
+
 import com.ThermalEquilibrium.homeostasis.Parameters.FeedforwardCoefficients;
 import com.ThermalEquilibrium.homeostasis.Parameters.PIDCoefficients;
 import com.arcrobotics.ftclib.controller.PIDController;
@@ -73,7 +75,7 @@ public class Trajectory {
                 this.trajectory.get(0).getPose().getHeading()
         ));
     }
-    public void follow(){
+    public void follow() throws InterruptedException {
         double x;
         double y;
         double turn;
@@ -86,8 +88,11 @@ public class Trajectory {
                 drivetrain.driveFieldCentric(x, y, turn, drivetrain.getRawIMUHeadingDegrees());
 
                 if (tolerance(averageError(x, y, turn), Config.toleranceMin, Config.toleranceMax)) {
-                    if (this.trajectory.get(i).getCommands() != null){
+                    if (this.trajectory.get(i).getCommands() != null) {
                         this.trajectory.get(i).runCommand();
+                    }
+                    if(this.trajectory.get(i).getWait() != 0 ){
+                        sleep(this.trajectory.get(i).getWait()); //change this to make a call to the opmode
                     }
                     break;
                 }
