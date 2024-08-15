@@ -26,6 +26,13 @@ public class Trajectory {
                 this.trajectory.get(0).getPose().getHeading()
         ));
     }
+
+    public Point getPoint(int currentIndex){
+        return this.trajectory.get(currentIndex);
+    }
+
+
+
     public void follow() throws InterruptedException {
         double x;
         double y;
