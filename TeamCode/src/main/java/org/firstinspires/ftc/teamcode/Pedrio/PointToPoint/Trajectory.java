@@ -2,67 +2,18 @@ package org.firstinspires.ftc.teamcode.Pedrio.PointToPoint;
 
 import static java.lang.Thread.sleep;
 
-import com.ThermalEquilibrium.homeostasis.Parameters.FeedforwardCoefficients;
-import com.ThermalEquilibrium.homeostasis.Parameters.PIDCoefficients;
 import com.arcrobotics.ftclib.controller.PIDController;
-import com.arcrobotics.ftclib.kinematics.wpilibkinematics.ChassisSpeeds;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 
 import org.firstinspires.ftc.teamcode.Pedrio.Config;
-import org.firstinspires.ftc.teamcode.Pedrio.SystemController;
 import org.firstinspires.ftc.teamcode.Robot.Subsystems.Drivetrain;
 
 import java.util.List;
-import java.util.function.DoubleSupplier;
 
 public class Trajectory {
     private Drivetrain drivetrain = new Drivetrain();
-
-    private final SystemController xController = new SystemController(
-            new PIDCoefficients(0.001, 0, 0),
-            new PIDCoefficients(0.001, 0, 0),
-            new DoubleSupplier() {
-                @Override
-                public double getAsDouble() {
-                    return drivetrain.getFusedPose().getX();
-                }
-            }
-            , new DoubleSupplier() {
-                 @Override
-                    public double getAsDouble() {
-                return drivetrain.getVelocity().x;
-                }
-            }
-            ,
-            0.3,
-            3,
-            3,
-            new FeedforwardCoefficients(0.1, 0.3, 0.001)
-
-    ) ;
-    private final SystemController yController = new SystemController(
-            new PIDCoefficients(0.001, 0, 0),
-            new PIDCoefficients(0.001, 0, 0),
-            new DoubleSupplier() {
-                @Override
-                public double getAsDouble() {
-                    return drivetrain.getFusedPose().getY();
-                }
-            }
-            , new DoubleSupplier() {
-        @Override
-        public double getAsDouble() {
-            return drivetrain.getVelocity().y;
-        }
-    }
-            ,
-            0.3,
-            3,
-            3,
-            new FeedforwardCoefficients(0.1, 0.3, 0.001)
-
-    ) ;
-
+    private final PIDController xController = new PIDController(0.001,0,0);
+    private final PIDController yController = new PIDController(0.001,0,0);
     private final PIDController turnController = new PIDController(0.001,0,0);
 
     private List<Point> trajectory;
@@ -81,8 +32,8 @@ public class Trajectory {
         double turn;
         for(int i = 0; i <= this.trajectory.size(); i++){
             while(true) {
-                x = xController.update(trajectory.get(i).getPose().getX(), 2000,1000);
-                y = yController.update(trajectory.get(i).getPose().getY(), 2000,1000);
+                x = xController.calculate(drivetrain.getPose().x, trajectory.get(i).getPose().getX());
+                y = yController.calculate(drivetrain.getPose().y, trajectory.get(i).getPose().getY());
                 turn = turnController.calculate(drivetrain.getPose().h, trajectory.get(i).getPose().getHeading());
 
                 drivetrain.driveFieldCentric(x, y, turn, drivetrain.getRawIMUHeadingDegrees());
