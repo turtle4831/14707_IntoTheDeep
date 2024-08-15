@@ -3,6 +3,8 @@ package org.firstinspires.ftc.teamcode.Pedrio.PointToPoint;
 import static java.lang.Thread.sleep;
 
 import com.arcrobotics.ftclib.controller.PIDController;
+import com.arcrobotics.ftclib.geometry.Pose2d;
+import com.google.gson.annotations.Expose;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 
 import org.firstinspires.ftc.teamcode.Pedrio.Config;
