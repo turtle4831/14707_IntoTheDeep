@@ -62,6 +62,7 @@ public class CSVisionProcessor implements VisionProcessor{
     }
 
     public CSVisionProcessor(int width, int leftX, int leftY, int middleX, int middleY, int rightX, int rightY){
+        //TODO add left stuff
         rectMiddle = new Rect(middleX, middleY, width, width);
         rectRight = new Rect(rightX, rightY, width, width);
     }
